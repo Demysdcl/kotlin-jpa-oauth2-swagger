@@ -15,4 +15,11 @@ class UserService(val userRepository: UserRepository) {
     fun findById(id: Long): User = userRepository.findById(id)
             .orElseThrow { ObjectNotFoundException("Any user found by id: $id") }
 
+    fun update(user: User): User = userRepository
+            .findById(user.id!!)
+            .map { save(user) }
+            .orElseThrow { ObjectNotFoundException("Any user found by id: ${user.id}") }
+
+    fun deleteById(id: Long): Any = userRepository.deleteById(id)
+
 }
