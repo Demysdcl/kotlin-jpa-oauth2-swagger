@@ -1,5 +1,6 @@
 package com.dclfactor.course.kotlinjpaoauth2swagger.domain.user
 
+import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.Role
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -21,5 +22,11 @@ class UserEndpoint(val userService: UserService) {
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long) = userService.deleteById(id)
+
+    @GetMapping("/roles")
+    fun roles(): List<Role> = userService.roles()
+
+    @GetMapping("/{id}/roles")
+    fun findUserRoles(@PathVariable id: Long) = userService.findById(id).roles
 
 }

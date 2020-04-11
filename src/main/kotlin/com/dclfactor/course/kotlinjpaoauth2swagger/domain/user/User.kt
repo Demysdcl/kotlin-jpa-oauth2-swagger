@@ -1,9 +1,7 @@
 package com.dclfactor.course.kotlinjpaoauth2swagger.domain.user
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.Role
+import javax.persistence.*
 
 @Entity
 data class User(
@@ -15,7 +13,10 @@ data class User(
         val lastName: String = "",
         val email: String = "",
         val password: String = "",
-        val enabled: Boolean = true
+        val enabled: Boolean = true,
+
+        @ManyToMany(fetch = FetchType.EAGER)
+        val roles: List<Role> = listOf()
 ) {
 
     override fun equals(other: Any?): Boolean =
