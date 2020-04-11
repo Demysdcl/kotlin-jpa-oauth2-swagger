@@ -1,4 +1,4 @@
-package com.dclfactor.course.kotlinjpaoauth2swagger.expection
+package com.dclfactor.course.kotlinjpaoauth2swagger.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

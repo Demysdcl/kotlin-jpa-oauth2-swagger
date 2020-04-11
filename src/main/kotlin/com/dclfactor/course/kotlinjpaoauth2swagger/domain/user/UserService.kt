@@ -2,9 +2,9 @@ package com.dclfactor.course.kotlinjpaoauth2swagger.domain.user
 
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.Role
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.RoleRepository
-import com.dclfactor.course.kotlinjpaoauth2swagger.expection.ObjectNotFoundException
+import com.dclfactor.course.kotlinjpaoauth2swagger.exception.ObjectAlreadyExistException
+import com.dclfactor.course.kotlinjpaoauth2swagger.exception.ObjectNotFoundException
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.GetMapping
 
 @Service
 class UserService(
@@ -37,4 +37,8 @@ class UserService(
     fun findByEmail(email: String?): User = userRepository.findByEmail(email!!)
             .orElseThrow { ObjectNotFoundException("Any use found by e-mail: $email") }
 
+    fun registerUser(user: User): User = userRepository
+            .findByEmail(user.email)
+            .apply { if(isPresent) throw ObjectAlreadyExistException("The e-mail:${user.email} already exists") }
+            .orElseGet { save(user) }
 }

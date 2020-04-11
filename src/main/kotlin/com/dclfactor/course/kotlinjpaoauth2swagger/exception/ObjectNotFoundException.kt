@@ -1,4 +1,4 @@
-package com.dclfactor.course.kotlinjpaoauth2swagger.expection
+package com.dclfactor.course.kotlinjpaoauth2swagger.exception
 
 import java.lang.RuntimeException
 
