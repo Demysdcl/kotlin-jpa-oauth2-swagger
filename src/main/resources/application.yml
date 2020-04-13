@@ -10,7 +10,7 @@ default:
 spring:
   mail:
     host: smtp.gmail.com
-    username: demyscota@gmail.com
+    username: youremail@gmail.com
     password: 12345
     properties:
       mail:
