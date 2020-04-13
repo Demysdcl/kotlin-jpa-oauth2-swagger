@@ -27,4 +27,5 @@ class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
                 .exceptionHandling()
                 .accessDeniedHandler(OAuth2AccessDeniedHandler())
     }
+
 }

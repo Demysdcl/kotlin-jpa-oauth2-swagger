@@ -16,10 +16,10 @@ class CORSFilter : Filter {
         val request = req as HttpServletRequest
 
         response.apply {
-            this.setHeader("Access-Control-Allow-Origin", "*")
-            this.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS,DELETE, PUT")
-            this.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization, x-auth-token,origin, content-type, accept")
-            this.setHeader("Access-Control-Origin", "*")
+            setHeader("Access-Control-Allow-Origin", "*")
+            setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS,DELETE, PUT")
+            setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization, x-auth-token,origin, content-type, accept")
+            setHeader("Access-Control-Origin", "*")
         }
 
         when (request.method) {

@@ -1,0 +1,22 @@
+<html xmlns:th="www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+    <title th:remove="all">Confirmar Registro de Usuário no Curso</title>
+</head>
+<body>
+    <div>
+        <h3>Caso você tenha solicitado acesso ao Curso - Kotlin & Spring Boot & Svelte 3</h3>
+        <br/>
+        <p>
+            Clique no link abaixo para confirmar a sua solicitação
+            <br/>
+            <span th:text="${confirmationUrl}" />
+        </p>
+        <p>
+            Nome:
+            <span th:text="${user.firstName}" />
+            <span th:text="${user.lastName}" />
+        </p>
+    </div>
+</body>
+</html>

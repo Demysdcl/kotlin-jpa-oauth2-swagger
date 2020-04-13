@@ -1,3 +1,27 @@
 server:
   servlet:
     context-path: /api
+
+default:
+  sender: demysdcl@gmail.com
+  recipient: demysdcl@gmail.com
+  url: http://localhost:8080
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    username: demyscota@gmail.com
+    password: M41l5050
+    properties:
+      mail:
+        smtp:
+          auth: true
+
+          ssl:
+            trust: smtp.gmail.com
+            enable: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+          startttls.enable: true

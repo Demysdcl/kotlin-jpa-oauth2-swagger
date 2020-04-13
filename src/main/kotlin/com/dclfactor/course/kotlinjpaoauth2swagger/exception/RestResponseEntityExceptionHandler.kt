@@ -11,14 +11,31 @@ import javax.servlet.http.HttpServletRequest
 class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(ObjectNotFoundException::class)
-    fun objectNotFound(e: ObjectNotFoundException, request: HttpServletRequest) = ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(StandardError(
-                    System.currentTimeMillis(),
-                    HttpStatus.NOT_FOUND.value(),
-                    "Not found",
-                    e.message ?: "",
-                    request.requestURI
-            ))
+    fun handleObjectNotFound(e: ObjectNotFoundException, request: HttpServletRequest) =
+            createResponseEntity(e, request, HttpStatus.NOT_FOUND)
+
+    @ExceptionHandler(ObjectAlreadyExistException::class)
+    fun handleObjectAlreadyExist(e: ObjectAlreadyExistException, request: HttpServletRequest) =
+            createResponseEntity(e, request, HttpStatus.CONFLICT)
+
+    @ExceptionHandler(ObjectNotEnableException::class)
+    fun handleObjectNotEnabled(e: ObjectNotEnableException, request: HttpServletRequest) =
+            createResponseEntity(e, request, HttpStatus.UNAUTHORIZED)
+
+    private fun createResponseEntity(e: RuntimeException, request: HttpServletRequest, httpStatus: HttpStatus): ResponseEntity<StandardError> {
+        return ResponseEntity
+                .status(httpStatus)
+                .body(createStandardError(e, request, httpStatus.value()))
+    }
+
+    private fun createStandardError(e: RuntimeException, request: HttpServletRequest, httpStatus: Int): StandardError {
+        return StandardError(
+                System.currentTimeMillis(),
+                httpStatus,
+                "Not found",
+                e.message ?: "",
+                request.requestURI
+        )
+    }
 
 }

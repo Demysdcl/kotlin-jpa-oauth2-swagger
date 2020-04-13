@@ -13,7 +13,7 @@ data class User(
         val lastName: String = "",
         val email: String = "",
         val password: String = "",
-        val enabled: Boolean = true,
+        val enabled: Boolean = false,
 
         @ManyToMany(fetch = FetchType.EAGER)
         val roles: List<Role> = listOf()

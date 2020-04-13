@@ -1,11 +1,22 @@
 package com.dclfactor.course.kotlinjpaoauth2swagger.domain.user
 
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.Role
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices
+import org.springframework.security.oauth2.provider.token.TokenStore
 import org.springframework.web.bind.annotation.*
+import java.security.Principal
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/users")
-class UserEndpoint(val userService: UserService) {
+@PreAuthorize("authenticated()")
+class UserEndpoint(
+        val userService: UserService,
+        val tokenStore: TokenStore,
+        val tokenServices: DefaultTokenServices
+) {
 
     @GetMapping
     fun findAll() = userService.findAll()
@@ -28,5 +39,21 @@ class UserEndpoint(val userService: UserService) {
 
     @GetMapping("/{id}/roles")
     fun findUserRoles(@PathVariable id: Long) = userService.findById(id).roles
+
+    @GetMapping("/main")
+    fun getMainUser(principal: Principal) = userService.findByEmail(principal.name)
+
+    @GetMapping("/logout")
+    fun logout(request: HttpServletRequest): ResponseEntity<Unit> =
+            ResponseEntity.noContent().build<Unit>().apply {
+                when (val authHeader = request.getHeader("Authorization")) {
+                    is String -> {
+                        val accessToken = tokenServices
+                                .readAccessToken(authHeader.replace("Bearer ", ""))
+                        tokenStore.removeAccessToken(accessToken)
+                        tokenServices.revokeToken(accessToken.value)
+                    }
+                }
+            }
 
 }

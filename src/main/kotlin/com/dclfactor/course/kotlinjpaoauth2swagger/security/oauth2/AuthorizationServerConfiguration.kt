@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
+import org.springframework.security.oauth2.provider.token.TokenStore
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore
 
 @Configuration
@@ -19,21 +20,11 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 class AuthorizationServerConfiguration(
         val passwordEncoder: PasswordEncoder,
         val userDetailsService: UserDetailsService,
+        val tokenStore: TokenStore,
 
         @Qualifier("authenticationManagerBean")
         val authenticationManager: AuthenticationManager
 ) : AuthorizationServerConfigurerAdapter() {
-
-    val tokenStore = InMemoryTokenStore()
-
-    @Bean
-    @Primary
-    fun tokenServices() = DefaultTokenServices()
-            .apply {
-                setSupportRefreshToken(true)
-                setAccessTokenValiditySeconds(60)
-                setTokenStore(tokenStore)
-            }
 
     override fun configure(clients: ClientDetailsServiceConfigurer?) {
         clients!!
