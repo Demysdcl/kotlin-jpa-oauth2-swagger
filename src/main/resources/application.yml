@@ -11,7 +11,7 @@ spring:
   mail:
     host: smtp.gmail.com
     username: demyscota@gmail.com
-    password: M41l5050
+    password: 12345
     properties:
       mail:
         smtp:
