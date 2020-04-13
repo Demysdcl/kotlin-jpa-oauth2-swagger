@@ -31,42 +31,48 @@ abstract class AbstractEmailService : EmailService {
     @Autowired
     lateinit var verificationTokenService: VerificationTokenService
 
-    override fun sendConfirmationHtmlEmail(user: User, vToken: VerificationToken?) {
+    override fun sendConfirmationHtmlEmail(user: User, vToken: VerificationToken?, reset: Boolean) {
         try {
-            sendHtmlEmail(prepareMimeMessageFromUser(user, vToken))
+            sendHtmlEmail(prepareMimeMessageFromUser(user, vToken, reset))
         } catch (message: MessagingException) {
             throw ObjectNotFoundException("Error when trying to send the e-mail")
         }
     }
 
-    fun prepareMimeMessageFromUser(user: User, vToken: VerificationToken?) = javaMailSender
-            .createMimeMessage()
-            .apply {
-                createMimeMessageHelper(this, user, vToken)
-            }
+    private fun prepareMimeMessageFromUser(user: User, vToken: VerificationToken?, reset: Boolean) =
+            javaMailSender.createMimeMessage()
+                    .apply {
+                        createMimeMessageHelper(this, user, vToken, reset)
+                    }
 
-    private fun createMimeMessageHelper(it: MimeMessage, user: User, vToken: VerificationToken?) =
+    private fun createMimeMessageHelper(it: MimeMessage, user: User, vToken: VerificationToken?, reset: Boolean) =
             MimeMessageHelper(it, true)
                     .apply {
                         setTo(user.email)
                         setFrom(sender)
-                        setSubject("Register confirmation")
+                        when {
+                            reset -> setSubject("Reset user password")
+                            else -> setSubject("Register confirmation")
+                        }
                         setSentDate(Date())
-                        setText(htmlFromTemplateUser(user, vToken), true)
+                        setText(htmlFromTemplateUser(user, vToken, reset), true)
                     }
 
 
-    private fun htmlFromTemplateUser(user: User, vToken: VerificationToken?): String =
-            templateEngine.process("email/registerUser", createContext(user, vToken))
+    private fun htmlFromTemplateUser(user: User, vToken: VerificationToken?, reset: Boolean): String =
+            templateEngine.process("email/registerUser", createContext(user, vToken, reset))
 
 
-    private fun createContext(user: User, vToken: VerificationToken?): Context =
+    private fun createContext(user: User, vToken: VerificationToken?, reset: Boolean): Context =
             Context().apply {
+                val path = "$contextPath/api/public/registration/users/"
                 setVariable("user", user)
-                setVariable(
-                        "confirmationUrl",
-                        "$contextPath/api/public/registration/users/confirmation?token=${verifiedToken(user, vToken).toString()}"
-                )
+                when {
+                    reset -> setVariable("confirmationUrl",
+                            "${path}reset?id=${user.id}&token=${verifiedToken(user, vToken)}")
+                    else -> setVariable("confirmationUrl",
+                            "${path}confirmation?token=${verifiedToken(user, vToken)}")
+                }
             }
 
     private fun verifiedToken(user: User, vToken: VerificationToken?): String =

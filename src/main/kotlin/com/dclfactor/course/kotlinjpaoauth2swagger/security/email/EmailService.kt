@@ -7,5 +7,5 @@ import javax.mail.internet.MimeMessage
 interface EmailService {
 
     fun sendHtmlEmail(message: MimeMessage): Unit
-    fun sendConfirmationHtmlEmail(user: User, vToken: VerificationToken?)
+    fun sendConfirmationHtmlEmail(user: User, vToken: VerificationToken?, reset: Boolean)
 }

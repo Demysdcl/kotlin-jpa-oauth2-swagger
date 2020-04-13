@@ -2,12 +2,15 @@ package com.dclfactor.course.kotlinjpaoauth2swagger.domain.user
 
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.Role
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.RoleRepository
+import com.dclfactor.course.kotlinjpaoauth2swagger.domain.token.VerificationToken
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.token.VerificationTokenRepository
 import com.dclfactor.course.kotlinjpaoauth2swagger.exception.ObjectAlreadyExistException
 import com.dclfactor.course.kotlinjpaoauth2swagger.exception.ObjectNotFoundException
 import com.dclfactor.course.kotlinjpaoauth2swagger.security.email.EmailService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
 import java.util.*
 
 @Service
@@ -51,14 +54,14 @@ class UserService(
                 if (isPresent) throw ObjectAlreadyExistException("The e-mail: ${user.email} already exists")
             }.orElseGet {
                 save(user.copy(enabled = false, roles = listOf(findOrCreateRole("ROLE_USER"))))
-                        .also { emailService.sendConfirmationHtmlEmail(it, null) }
+                        .also { emailService.sendConfirmationHtmlEmail(it, null, false) }
             }
 
-    fun generateNewVerificationToken(email: String) =
+    fun generateNewVerificationToken(email: String, reset: Boolean) =
             findByEmail(email).run {
                 verificationTokenRepository.save(findAndUpdateVerificationToken(this))
                         .apply {
-                            emailService.sendConfirmationHtmlEmail(this.user, this)
+                            emailService.sendConfirmationHtmlEmail(this.user, this, reset)
                         }
             }
 
@@ -72,5 +75,39 @@ class UserService(
                         get()
                     }
 
+    fun createVerificationTokenForUser(user: User, token: String) {
+        verificationTokenRepository.save(VerificationToken(token = token, user = user))
+    }
+
+    fun validateToken(token: String): String = this.verificationTokenRepository
+            .findByToken(token)
+            .map {
+                when {
+                    Calendar.getInstance().after(it.expiryDate) -> "expiredToken"
+                    else -> {
+                        userRepository.save(it.user.copy(enabled = true))
+                        return@map ""
+                    }
+                }
+            }.orElseGet { "invalidToken" }
+
+    fun validatePasswordResetToken(id: Long, token: String): String =
+            verificationTokenRepository.findByToken(token)
+                    .run {
+                        when {
+                            (isPresent && get().user.id != id) -> "invalidToken"
+                            (isPresent && Calendar.getInstance().after(get().expiryDate)) ->
+                                "expiredToken"
+                            else -> ""
+                        }
+                    }
+
+    fun getVerificationTokenByToken(token: String): VerificationToken =
+            verificationTokenRepository.findByToken(token)
+                    .orElseThrow { ObjectNotFoundException("Token not found") }
+
+    fun changePassword(user: User, password: String) {
+        userRepository.save(user.copy(password = passwordEncoder.encode(password)))
+    }
 
 }

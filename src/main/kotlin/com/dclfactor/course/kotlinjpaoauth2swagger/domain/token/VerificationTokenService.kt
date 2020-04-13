@@ -11,19 +11,5 @@ class VerificationTokenService(
         val userRepository: UserRepository
 ) {
 
-    fun createVerificationTokenForUser(user: User, token: String) {
-        verificationTokenRepository.save(VerificationToken(token = token, user = user))
-    }
 
-    fun validateToken(token: String): String = this.verificationTokenRepository
-            .findByToken(token)
-            .map {
-                when {
-                    Calendar.getInstance().after(it.expiryDate) -> "expiredToken"
-                    else -> {
-                        userRepository.save(it.user.copy(enabled = true))
-                        return@map ""
-                    }
-                }
-            }.orElseGet { "invalidToken" }
 }
