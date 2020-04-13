@@ -38,7 +38,16 @@ class WebSecurityConfiguration(
     override fun configure(web: WebSecurity?) {
         web!!.ignoring()
                 .antMatchers(HttpMethod.OPTIONS, "/**")
-                .antMatchers("/public/**", "/logout/**")
+                .antMatchers(
+                        "/public/**",
+                        "/logout/**",
+                        "/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/**",
+                        "/swagger-ui.html",
+                        "/webjars/**"
+                )
 
     }
 }

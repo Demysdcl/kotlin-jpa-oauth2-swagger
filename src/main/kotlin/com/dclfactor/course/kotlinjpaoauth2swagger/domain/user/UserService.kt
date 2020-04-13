@@ -75,9 +75,7 @@ class UserService(
                         get()
                     }
 
-    fun createVerificationTokenForUser(user: User, token: String) {
-        verificationTokenRepository.save(VerificationToken(token = token, user = user))
-    }
+
 
     fun validateToken(token: String): String = this.verificationTokenRepository
             .findByToken(token)

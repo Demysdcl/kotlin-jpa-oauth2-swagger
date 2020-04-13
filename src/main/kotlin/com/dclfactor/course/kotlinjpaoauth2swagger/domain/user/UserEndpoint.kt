@@ -2,6 +2,9 @@ package com.dclfactor.course.kotlinjpaoauth2swagger.domain.user
 
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.role.Role
 import com.dclfactor.course.kotlinjpaoauth2swagger.util.GenericResponse
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/users/")
+@Api(description = "Users management  endpoints")
 class UserEndpoint(
         val userService: UserService,
         val tokenStore: TokenStore,
@@ -22,7 +26,8 @@ class UserEndpoint(
     fun findAll() = userService.findAll()
 
     @GetMapping("{id}")
-    fun findById(@PathVariable id: Long): User = userService.findById(id)
+    @ApiOperation("Specific user by ID")
+    fun findById(@ApiParam("User id, can't be empty") @PathVariable id: Long): User = userService.findById(id)
 
     @PostMapping
     fun save(@RequestBody user: User) = userService.save(user)
@@ -67,11 +72,15 @@ class UserEndpoint(
     @PostMapping("savePassword")
     fun savePassword(@RequestParam("token") token: String, @RequestParam("password") password: String): ResponseEntity<Any> =
             when (val response = this.userService.validateToken(token)) {
-                "" -> userService.getVerificationTokenByToken(token).run {
-                    userService.changePassword(this.user, password)
-                    return@run ResponseEntity.noContent().build()
-                }
+                "" -> saveNewPassword(token, password)
                 else -> ResponseEntity.status(HttpStatus.SEE_OTHER).body(GenericResponse(response))
             }
+
+    private fun saveNewPassword(token: String, password: String): ResponseEntity<Any> =
+            userService.getVerificationTokenByToken(token)
+                    .run {
+                        userService.changePassword(this.user, password)
+                        return@run ResponseEntity.noContent().build()
+                    }
 
 }

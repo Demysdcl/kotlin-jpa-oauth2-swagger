@@ -65,7 +65,7 @@ abstract class AbstractEmailService : EmailService {
 
     private fun createContext(user: User, vToken: VerificationToken?, reset: Boolean): Context =
             Context().apply {
-                val path = "$contextPath/api/public/registration/users/"
+                val path = "$contextPath/public/registration/users/"
                 setVariable("user", user)
                 when {
                     reset -> setVariable("confirmationUrl",

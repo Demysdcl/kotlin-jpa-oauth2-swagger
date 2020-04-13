@@ -11,5 +11,8 @@ class VerificationTokenService(
         val userRepository: UserRepository
 ) {
 
+    fun createVerificationTokenForUser(user: User, token: String) {
+        verificationTokenRepository.save(VerificationToken(token = token, user = user))
+    }
 
 }
