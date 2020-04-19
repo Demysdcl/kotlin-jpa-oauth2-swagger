@@ -10,6 +10,6 @@ data class Role(
         @Id
         @GeneratedValue
         @Column(name = "role_id")
-        var id: Long? = null,
+        val id: Long? = null,
         val name: String = ""
 )

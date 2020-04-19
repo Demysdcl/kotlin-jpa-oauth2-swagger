@@ -34,7 +34,7 @@ class UserEndpoint(
 
     @PutMapping("{id}")
     fun update(@PathVariable id: Long, @RequestBody user: User): User = userService
-            .update(user.apply { this.id = id })
+            .update(user.copy(id = id))
 
     @DeleteMapping("{id}")
     fun delete(@PathVariable id: Long) = userService.deleteById(id)

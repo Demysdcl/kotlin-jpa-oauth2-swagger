@@ -1,6 +1,7 @@
 package com.dclfactor.course.kotlinjpaoauth2swagger.domain.token
 
 import com.dclfactor.course.kotlinjpaoauth2swagger.domain.user.User
+import com.dclfactor.course.kotlinjpaoauth2swagger.util.DateUtil
 import java.util.*
 import javax.persistence.*
 
@@ -9,24 +10,18 @@ data class VerificationToken @JvmOverloads constructor(
         @Id
         @GeneratedValue
         @Column(name = "token_id")
-        var id: Long? = null,
+        val id: Long? = null,
 
-        var token: String = "",
+        val token: String = "",
 
         @OneToOne
-        val user: User = User()
+        val user: User = User(),
+
+        val expiryDate: Date = DateUtil.createExpirationDate()
 ) {
 
-    var expiryDate: Date = createExpirationDate()
+    fun updateToken(token: String) = this.copy(
+            token = token, expiryDate = DateUtil.createExpirationDate()
+    )
 
-    fun updateToken(token: String) {
-        this.token = token
-        this.expiryDate = this.createExpirationDate()
-    }
-
-    private fun createExpirationDate(): Date {
-        return Calendar.getInstance()
-                .apply { add(Calendar.MINUTE, 60 * 24) }
-                .time
-    }
 }

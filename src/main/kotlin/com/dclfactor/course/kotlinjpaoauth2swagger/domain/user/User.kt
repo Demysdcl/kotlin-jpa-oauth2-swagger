@@ -8,7 +8,7 @@ data class User(
         @Id
         @GeneratedValue
         @Column(name ="user_id")
-        var id: Long? = null,
+        val id: Long? = null,
         val firstName: String = "",
         val lastName: String = "",
         val email: String = "",

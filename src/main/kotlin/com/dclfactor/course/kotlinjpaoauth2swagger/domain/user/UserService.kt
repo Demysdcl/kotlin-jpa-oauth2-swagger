@@ -9,8 +9,6 @@ import com.dclfactor.course.kotlinjpaoauth2swagger.exception.ObjectNotFoundExcep
 import com.dclfactor.course.kotlinjpaoauth2swagger.security.email.EmailService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
 import java.util.*
 
 @Service
@@ -69,13 +67,11 @@ class UserService(
             verificationTokenRepository
                     .findByUser(user)
                     .run {
-                        if (this.isPresent) {
-                            get().updateToken(UUID.randomUUID().toString())
+                        when {
+                            isPresent -> get().updateToken(UUID.randomUUID().toString())
+                            else -> get()
                         }
-                        get()
                     }
-
-
 
     fun validateToken(token: String): String = this.verificationTokenRepository
             .findByToken(token)
